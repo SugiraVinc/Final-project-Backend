@@ -34,7 +34,7 @@ app.use('/api/notes',noteRoutes)
 const server = http.createServer(app);
 export const io = new SocketIOServer(server, {
   cors: {
-    origin: ['*', 'http://localhost:3000'],
+    origin: ['*', 'https://final-project-kappa-dusky.vercel.app/'],
     credentials: true,
   },
 });
