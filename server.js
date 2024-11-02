@@ -40,8 +40,8 @@ export const io = new SocketIOServer(server, {
 });
 
 chatApp()
-server.listen(PORT,() => {
-    console.log(App is running on PORT ${PORT})
-})
+server.listen(PORT, () => {
+  console.log(`App is running on PORT ${PORT}`);
+});
 
 export default app
