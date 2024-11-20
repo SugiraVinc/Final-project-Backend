@@ -13,6 +13,6 @@ const contributorContentSchema = new mongoose.Schema({
     isReviewed: {type: Boolean, default: false}
 });
 
-const ContributorContent = mongoose.model('ContributorContent', contributorContentSchema);
+const Testimony = mongoose.model('testimony', contributorContentSchema);
 
-export default ContributorContent;
+export default Testimony;

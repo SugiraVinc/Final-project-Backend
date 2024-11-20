@@ -4,6 +4,7 @@ import upload from '../helpers/multer/galleryMulter.js'
 import Comment from '../models/comment.js';
 import User from '../models/userModel.js';
 import Like from '../models/like.js';
+import Testimony from '../models/testimonyModel.js';
 
 export const createContributorContent = async(req, res) => {
   upload(req, res, async(err) => {
@@ -50,6 +51,51 @@ export const createContributorContent = async(req, res) => {
     }
   })
 }
+export const createTestimonyContent = async(req, res) => {
+  upload(req, res, async(err) => {
+    if(err) {
+      return res.status(400).json({err})
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ err: 'Please select an image or video' });
+    }
+
+    try {
+      const { room, title, description } = req.body;
+      const userId = req.user._id;
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "SUGIRA_GALLERY",
+        resource_type: "auto",
+      });
+
+      let newTestimony;
+      if (req.file.mimetype.startsWith('image/') || req.file.mimetype.startsWith('video/')) {
+        newTestimony = await Testimony.create({
+          userId,
+          mediaType: req.file.mimetype.startsWith('image/') ? 'image' : 'video',
+          media: {
+            public_id: result.public_id,
+            url: result.secure_url
+          },
+          room, 
+          title,
+          description
+        });
+      } else {
+        return res.status(400).json({ err: 'Invalid file type. Please upload an image or video.' });
+      }
+
+      return res.status(200).json({
+        message: 'Created Testimony successfully',
+        newTestimony
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  })
+}
   
 
 export const getContributorContent = async (req, res) => {
@@ -68,6 +114,22 @@ export const getContributorContent = async (req, res) => {
         });
     }
 };
+export const getTestimonyContent = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const contributorContent = await Testimony.find({ userId });
+
+        res.status(200).json({
+            success: true,
+            data: contributorContent
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Failed to fetch Testimony content'
+        });
+    }
+};
 
 export const getContent = async(req, res) => {
   try {
@@ -81,6 +143,21 @@ export const getContent = async(req, res) => {
     res.status(500).json({
         success: false,
         message: error.message || 'Failed to fetch contributor content'
+    });
+}
+}
+export const getAllTestimonyContent = async(req, res) => {
+  try {
+    const contributorContent = await Testimony.find();
+
+    res.status(200).json({
+        success: true,
+        data: contributorContent
+    });
+} catch (error) {
+    res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to fetch Testimony content'
     });
 }
 }
@@ -105,6 +182,30 @@ export const getSingleContent = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to fetch contributor content',
+    });
+  }
+};
+export const getSingleTestimonyContent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const contributorContent = await Testimony.findById(id);
+
+    if (!contributorContent) {
+      return res.status(404).json({
+        success: false,
+        message: 'Content not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: contributorContent,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch Testimony content',
     });
   }
 };
@@ -243,5 +344,58 @@ export const getLikesByContentId = async (req, res) => {
       success: false,
       message: error.message || 'Failed to fetch likes',
     });
+  }
+};
+
+export const deleteContributorContent = async (req, res) => {
+  try {
+      const contentId = req.params.id; // Get the content ID from the request parameters
+
+      // Delete the content by its ID
+      const deletedContent = await ContributorContent.findByIdAndDelete(contentId);
+
+      if (!deletedContent) {
+          return res.status(404).json({
+              success: false,
+              message: 'Content not found'
+          });
+      }
+
+      res.status(200).json({
+          success: true,
+          message: 'Content successfully deleted',
+          data: deletedContent
+      });
+  } catch (error) {
+      res.status(500).json({
+          success: false,
+          message: error.message || 'Failed to delete content'
+      });
+  }
+};
+export const deleteTestimonyContent = async (req, res) => {
+  try {
+      const contentId = req.params.id; // Get the content ID from the request parameters
+
+      // Delete the content by its ID
+      const deletedContent = await Testimony.findByIdAndDelete(contentId);
+
+      if (!deletedContent) {
+          return res.status(404).json({
+              success: false,
+              message: 'Content not found'
+          });
+      }
+
+      res.status(200).json({
+          success: true,
+          message: 'Content successfully deleted',
+          data: deletedContent
+      });
+  } catch (error) {
+      res.status(500).json({
+          success: false,
+          message: error.message || 'Failed to delete content'
+      });
   }
 };
