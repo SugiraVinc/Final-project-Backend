@@ -281,7 +281,7 @@ export const createLike = async (req, res) => {
     }
 
     // Check if the content exists
-    const contentExists = await ContributorContent.findById(contentId);
+    const contentExists = await Testimony.findById(contentId);
     if (!contentExists) {
       return res.status(404).json({
         success: false,
