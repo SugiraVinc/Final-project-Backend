@@ -280,15 +280,7 @@ export const createLike = async (req, res) => {
       });
     }
 
-    // Check if the content exists
-    const contentExists = await Testimony.findById(contentId);
-    if (!contentExists) {
-      return res.status(404).json({
-        success: false,
-        message: 'Content not found.',
-      });
-    }
-
+  
     // Check if the user has already liked the content
     const existingLike = await Like.findOne({ contentId, userId });
     if (existingLike) {
@@ -302,7 +294,7 @@ export const createLike = async (req, res) => {
     const newLike = new Like({
       contentId,
       userId,
-      like: 1, // Default value for a like
+      like: 1,
     });
 
     // Save the new like

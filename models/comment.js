@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const commentSchema = new mongoose.Schema({
   contentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ContributorContent', // Reference to your content model
     required: true,
   },
   userId: {

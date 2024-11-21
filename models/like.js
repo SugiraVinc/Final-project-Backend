@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const likeSchema = new mongoose.Schema({
   contentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'testimony', // Reference to your content model
     required: true,
   },
   userId: {
