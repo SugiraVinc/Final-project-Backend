@@ -5,6 +5,7 @@ import Comment from '../models/comment.js';
 import User from '../models/userModel.js';
 import Like from '../models/like.js';
 import Testimony from '../models/testimonyModel.js';
+import Poem from '../models/poem.js';
 
 export const createContributorContent = async(req, res) => {
   upload(req, res, async(err) => {
@@ -397,5 +398,150 @@ export const deleteTestimonyContent = async (req, res) => {
           success: false,
           message: error.message || 'Failed to delete content'
       });
+  }
+};
+
+export const setContributor = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { isContributor: true },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'User updated to contributor successfully',
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to update user',
+    });
+  }
+};
+
+
+export const createPoem = async (req, res) => {
+  try {
+    const { title, description, room } = req.body;
+
+    // Validate input
+    if (!title ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title is required',
+      });
+    }
+    if (!description) {
+      return res.status(400).json({
+        success: false,
+        message: 'description is required',
+      });
+    }
+    if (!room) {
+      return res.status(400).json({
+        success: false,
+        message: 'room are required',
+      });
+    }
+
+    // Create and save the poem
+    const newPoem = await Poem.create({
+      title,
+      description,
+      room,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Poem created successfully',
+      data: newPoem,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to create poem',
+    });
+  }
+};
+
+
+export const getAllPoems = async (req, res) => {
+  try {
+    const poems = await Poem.find().sort({ createdAt: -1 }); // Sort by newest first
+
+    res.status(200).json({
+      success: true,
+      message: 'Poems fetched successfully',
+      data: poems,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch poems',
+    });
+  }
+};
+
+export const getSinglePoem = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const poem = await Poem.findById(id);
+
+    if (!poem) {
+      return res.status(404).json({
+        success: false,
+        message: 'Poem not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Poem fetched successfully',
+      data: poem,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch poem',
+    });
+  }
+};
+
+export const deletePoem = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedPoem = await Poem.findByIdAndDelete(id);
+
+    if (!deletedPoem) {
+      return res.status(404).json({
+        success: false,
+        message: 'Poem not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Poem deleted successfully',
+      data: deletedPoem,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to delete poem',
+    });
   }
 };

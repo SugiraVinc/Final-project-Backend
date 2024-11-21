@@ -13,7 +13,12 @@ import {
     getTestimonyContent,
     getAllTestimonyContent,
     getSingleTestimonyContent,
-    deleteTestimonyContent
+    deleteTestimonyContent,
+    setContributor,
+    createPoem,
+    getAllPoems,
+    getSinglePoem,
+    deletePoem
 } from '../controller/contributorGalleryController.js'
 import authCheck from '../middleware/authMiddleware.js'
 
@@ -28,10 +33,15 @@ router.post('/comments/:contentId', authCheck, createComment);
 router.get('/comments/:contentId', getCommentsByContentId);
 router.post('/likes/:contentId', authCheck, createLike); 
 router.get('/likes/:contentId', getLikesByContentId); 
-router.post('/testimony', createTestimonyContent)
-router.get('/testimony-user', getTestimonyContent)
+router.post('/testimony',authCheck, createTestimonyContent)
+router.get('/testimony-user',authCheck, getTestimonyContent)
 router.get('/testimony', getAllTestimonyContent)
 router.get('/testimony/:id', getSingleTestimonyContent)
-router.delete('/testimony/:id', deleteTestimonyContent)
+router.delete('/testimony/:id',authCheck, deleteTestimonyContent)
+router.put('/set-contributor',authCheck, setContributor)
+router.post('/poem',authCheck, createPoem)
+router.get('/poem', getAllPoems)
+router.get('/poem/:id', getSinglePoem)
+router.delete('/poem/:id',authCheck, deletePoem)
 
 export default router
